@@ -1,7 +1,8 @@
 import React from "react";
 
-const errorMessage = ({ message }) => (
-  <p className="has-text-weight-bold has-text-danger">{message}</p>
-);
+const ErrorMessage = ({ message }) =>
+  message ? (
+    <p className="font-bold text-red-600 text-sm mt-2">{message}</p>
+  ) : null;
 
-export default errorMessage;
+export default ErrorMessage;

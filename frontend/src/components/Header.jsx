@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-
 import { UserContext } from "../context/UserContext";
 
 const Header = ({ title }) => {
@@ -10,10 +9,13 @@ const Header = ({ title }) => {
   };
 
   return (
-    <div className="has-text-centered m-7">
-      <h1 className="title">{title}</h1>
+    <div className="text-center my-7">
+      <h1 className="text-3xl font-bold">{title}</h1>
       {token && (
-        <button className="button" onClick={handleLogout}>
+        <button
+          className="mt-4 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
+          onClick={handleLogout}
+        >
           Logout
         </button>
       )}

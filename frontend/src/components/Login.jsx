@@ -1,5 +1,4 @@
 import React, { useState, useContext } from "react";
-
 import ErrorMessage from "./ErrorMessage";
 import { UserContext } from "../context/UserContext";
 
@@ -18,10 +17,7 @@ const Login = () => {
       ),
     };
 
-    const response = await fetch(
-      "http://localhost:8000/api/login",
-      requestOptions
-    );
+    const response = await fetch("http://localhost:8000/api/login", requestOptions);
     const data = await response.json();
 
     if (!response.ok) {
@@ -37,40 +33,47 @@ const Login = () => {
   };
 
   return (
-    <div className="column">
-      <form className="box" onSubmit={handleSubmit}>
-        <h1 className="title has-text-centered">Login</h1>
-        <div className="field">
-          <label className="label">Rz-Name</label>
-          <div className="control">
-            <input
-              type="name"
-              placeholder="Enter Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="input"
-              required
-            />
-          </div>
+    <div className="w-full max-w-sm mx-auto">
+      <form
+        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+        onSubmit={handleSubmit}
+      >
+        <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Rz-Name
+          </label>
+          <input
+            type="text"
+            placeholder="Enter Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
+            required
+          />
         </div>
-        <div className="field">
-          <label className="label">Password</label>
-          <div className="control">
-            <input
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input"
-              required
-            />
-          </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Password
+          </label>
+          <input
+            type="password"
+            placeholder="Enter password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
+            required
+          />
         </div>
         <ErrorMessage message={errorMessage} />
-        <br />
-        <button className="button is-primary" type="submit">
-          Login
-        </button>
+        <div className="mt-4">
+          <button
+            type="submit"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+          >
+            Login
+          </button>
+        </div>
       </form>
     </div>
   );
