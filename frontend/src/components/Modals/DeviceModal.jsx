@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import moment from "moment";
 import Tabs from "../TabComponents/Tabs";
 import roomCodesData from "./data/hoersaal_raumcode.json";
 
@@ -13,7 +12,7 @@ const DeviceModal = ({
   ownerView,
   isAdmin,
 }) => {
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     title: "",
     deviceType: "",
     description: "",
@@ -28,7 +27,9 @@ const DeviceModal = ({
     timestampPurchase: "",
     costCentre: "",
     seller: "",
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormState);
 
   useEffect(() => {
     if (!device_id) return;
@@ -73,30 +74,14 @@ const DeviceModal = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((fd) => ({ ...fd, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const cleanForm = () => {
-    setFormData({
-      title: "",
-      deviceType: "",
-      description: "",
-      accessories: "",
-      usernameBuyer: "",
-      imageURL: "",
-      serialNumber: "",
-      owner: "",
-      roomCode: "",
-      price: "",
-      timestampWarrantyEnd: "",
-      timestampPurchase: "",
-      costCentre: "",
-      seller: "",
-    });
-  };
+  const cleanForm = () => setFormData(initialFormState);
 
   const submitDevice = async (e, method) => {
     e.preventDefault();
+
     const url = device_id
       ? `http://localhost:8000/devices/${device_id}`
       : "http://localhost:8000/devices";
@@ -135,20 +120,32 @@ const DeviceModal = ({
     }
   };
 
-  const extractRoomCodes = () => roomCodesData.map((item) => item.room_code);
+  const extractRoomCodes = () => roomCodesData.map(({ room_code }) => room_code);
+
+  if (!active) return null;
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 ${
-        active ? "block" : "hidden"
-      }`}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-auto">
-        <header className="bg-blue-100 p-4 rounded-t-lg">
+        <header className="bg-blue-100 p-4 rounded-t-lg flex justify-between items-center">
           <h1 className="text-xl font-semibold">
-            {fullView ? "Overview" : device_id ? "Update Device" : "Create Device"}
+            {fullView
+              ? "Overview"
+              : device_id
+              ? "Update Device"
+              : "Create Device"}
           </h1>
+          <div>
+            <button
+              onClick={handleModal}
+              className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
+              title="Close modal"
+            >
+              X
+            </button>
+          </div>
         </header>
+
         <section className="p-4">
           {fullView ? (
             <Tabs
@@ -159,7 +156,6 @@ const DeviceModal = ({
             />
           ) : ownerView ? (
             <div>
-              {/* Owner view content */}
               <p>Owner view not fully implemented</p>
             </div>
           ) : (
@@ -167,6 +163,7 @@ const DeviceModal = ({
               onSubmit={(e) => submitDevice(e, device_id ? "PUT" : "POST")}
               className="space-y-4"
             >
+              {/* Replace below with your actual form fields */}
               {[
                 { label: "Title", name: "title" },
                 { label: "Device Type", name: "deviceType" },
@@ -185,8 +182,8 @@ const DeviceModal = ({
                 <div key={name} className="flex flex-col">
                   <label className="mb-1 font-medium">{label}</label>
                   <input
-                    name={name}
                     type="text"
+                    name={name}
                     placeholder={`Enter ${label.toLowerCase()}`}
                     value={formData[name]}
                     onChange={handleChange}
@@ -220,7 +217,9 @@ const DeviceModal = ({
                 <button
                   type="submit"
                   className={`${
-                    device_id ? "bg-blue-500 hover:bg-blue-600" : "bg-green-500 hover:bg-green-600"
+                    device_id
+                      ? "bg-blue-500 hover:bg-blue-600"
+                      : "bg-green-500 hover:bg-green-600"
                   } text-white px-4 py-2 rounded`}
                 >
                   {device_id ? "Update" : "Create"}
@@ -236,6 +235,7 @@ const DeviceModal = ({
             </form>
           )}
         </section>
+
         {fullView && (
           <footer className="bg-blue-100 p-4 rounded-b-lg flex justify-end">
             <button
