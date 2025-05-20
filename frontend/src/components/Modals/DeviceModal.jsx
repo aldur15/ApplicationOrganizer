@@ -151,63 +151,51 @@ const DeviceModal = ({
         </header>
         <section className="p-4">
           {fullView ? (
-            <Tabs device_id={device_id} token={token} isAdmin={isAdmin} setErrorMessage={setErrorMessage} />
+            <Tabs
+              device_id={device_id}
+              token={token}
+              isAdmin={isAdmin}
+              setErrorMessage={setErrorMessage}
+            />
           ) : ownerView ? (
             <div>
               {/* Owner view content */}
               <p>Owner view not fully implemented</p>
             </div>
           ) : (
-            <form onSubmit={(e) => submitDevice(e, device_id ? "PUT" : "POST")} className="space-y-4">
+            <form
+              onSubmit={(e) => submitDevice(e, device_id ? "PUT" : "POST")}
+              className="space-y-4"
+            >
               {[
-                { label: "Title", name: "title", type: "text", placeholder: "Enter Title" },
-                { label: "Device Type", name: "deviceType", type: "text", placeholder: "Enter device type" },
-                { label: "Description", name: "description", type: "text", placeholder: "Enter description" },
-                { label: "Accessories", name: "accessories", type: "text", placeholder: "Enter accessories" },
-                { label: "Serial Number", name: "serialNumber", type: "text", placeholder: "Enter serial number" },
-                { label: "RZ Username Buyer", name: "usernameBuyer", type: "text", placeholder: "Enter rz username buyer" },
-                { label: "Image URL", name: "imageURL", type: "text", placeholder: "Enter image URL" },
-                { label: "Owner", name: "owner", type: "text", placeholder: "Enter owner" },
-                { label: "Price", name: "price", type: "text", placeholder: "Enter price" },
-                { label: "Timestamp Warranty End", name: "timestampWarrantyEnd", type: "text", placeholder: "Enter timestamp warranty end" },
-                { label: "Timestamp Purchase", name: "timestampPurchase", type: "text", placeholder: "Enter timestamp purchase" },
-                { label: "Cost Centre", name: "costCentre", type: "text", placeholder: "Enter cost centre" },
-                { label: "Seller", name: "seller", type: "text", placeholder: "Enter seller" },
-              ].map(({ label, name, type, placeholder }) => (
+                { label: "Title", name: "title" },
+                { label: "Device Type", name: "deviceType" },
+                { label: "Description", name: "description" },
+                { label: "Accessories", name: "accessories" },
+                { label: "Serial Number", name: "serialNumber" },
+                { label: "RZ Username Buyer", name: "usernameBuyer" },
+                { label: "Image URL", name: "imageURL" },
+                { label: "Owner", name: "owner" },
+                { label: "Price", name: "price" },
+                { label: "Timestamp Warranty End", name: "timestampWarrantyEnd" },
+                { label: "Timestamp Purchase", name: "timestampPurchase" },
+                { label: "Cost Centre", name: "costCentre" },
+                { label: "Seller", name: "seller" },
+              ].map(({ label, name }) => (
                 <div key={name} className="flex flex-col">
                   <label className="mb-1 font-medium">{label}</label>
-                  {name === "roomCode" ? (
-                    <select
-                      name={name}
-                      value={formData[name]}
-                      onChange={handleChange}
-                      required
-                      className="border rounded px-3 py-2"
-                    >
-                      <option value="" disabled>
-                        Select room code
-                      </option>
-                      {extractRoomCodes().map((code) => (
-                        <option key={code} value={code}>
-                          {code}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      name={name}
-                      type={type}
-                      placeholder={placeholder}
-                      value={formData[name]}
-                      onChange={handleChange}
-                      required
-                      className="border rounded px-3 py-2"
-                    />
-                  )}
+                  <input
+                    name={name}
+                    type="text"
+                    placeholder={`Enter ${label.toLowerCase()}`}
+                    value={formData[name]}
+                    onChange={handleChange}
+                    required
+                    className="border rounded px-3 py-2"
+                  />
                 </div>
               ))}
 
-              {/* Separate roomCode select */}
               <div className="flex flex-col">
                 <label className="mb-1 font-medium">Room Code</label>
                 <select
@@ -227,49 +215,37 @@ const DeviceModal = ({
                   ))}
                 </select>
               </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="submit"
+                  className={`${
+                    device_id ? "bg-blue-500 hover:bg-blue-600" : "bg-green-500 hover:bg-green-600"
+                  } text-white px-4 py-2 rounded`}
+                >
+                  {device_id ? "Update" : "Create"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleModal}
+                  className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
             </form>
           )}
         </section>
-        <footer className="bg-blue-100 p-4 rounded-b-lg flex justify-end space-x-3">
-          {fullView ? (
+        {fullView && (
+          <footer className="bg-blue-100 p-4 rounded-b-lg flex justify-end">
             <button
               onClick={handleModal}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             >
               Close
             </button>
-          ) : device_id ? (
-            <>
-              <button
-                onClick={(e) => submitDevice(e, "PUT")}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                Update
-              </button>
-              <button
-                onClick={handleModal}
-                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={(e) => submitDevice(e, "POST")}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-              >
-                Create
-              </button>
-              <button
-                onClick={handleModal}
-                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-            </>
-          )}
-        </footer>
+          </footer>
+        )}
       </div>
     </div>
   );
