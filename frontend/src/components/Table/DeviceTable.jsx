@@ -1,5 +1,4 @@
 import React, { useEffect, useContext, useState } from "react";
-
 import ErrorMessage from "../ErrorMessage";
 import { UserContext } from "../../context/UserContext";
 import DeviceModal from "../Modals/DeviceModal";
@@ -15,41 +14,34 @@ const DeviceTable = () => {
   const [fullView, setFullView] = useState(false);
   const [, setOwnerDeviceView] = useState(false);
   const [isAdmin, setIsAdmin] = useState(null);
+  const [isCreating, setIsCreating] = useState(false); // ✅ NEW
 
   const getUser = async () => {
-    const requestOptions = {
+    const response = await fetch(`http://localhost:8000/api/users/me`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
-    };
-    const response = await fetch(
-      `http://localhost:8000/api/users/me`,
-      requestOptions
-    );
+    });
 
     if (!response.ok) {
       setErrorMessage("Could not get the user");
     } else {
       const data = await response.json();
       setIsAdmin(data.is_admin);
-      console.log(isAdmin);
     }
   };
 
   const getDevices = async () => {
-    const requestOptions = {
+    const response = await fetch("http://localhost:8000/devices/all", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
-    };
-    const response = await fetch(
-      "http://localhost:8000/devices/all",
-      requestOptions
-    );
+    });
+
     if (!response.ok) {
       setErrorMessage("Couldn't load the Devices");
     } else {
@@ -60,17 +52,14 @@ const DeviceTable = () => {
   };
 
   const deleteDevice = async (deviceId) => {
-    const requestOptions = {
+    const response = await fetch(`http://localhost:8000/devices/${deviceId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
-    };
-    const response = await fetch(
-      `http://localhost:8000/devices/${deviceId}`,
-      requestOptions
-    );
+    });
+
     if (!response.ok) {
       setErrorMessage("Failed to delete device");
     }
@@ -78,41 +67,48 @@ const DeviceTable = () => {
     getDevices();
   };
 
-  const openFullView = async (deviceId) => {
+  const openFullView = (deviceId) => {
     setOwnerDeviceView(null);
     setFullView(true);
+    setIsCreating(false); // ✅ Not creating
     setDeviceId(deviceId);
     setActiveModal(true);
   };
 
-  const createDevice = async (deviceId) => {
+  const createDevice = () => {
     setOwnerDeviceView(null);
-    setFullView(null);
+    setFullView(false); // ✅ Not full view
+    setDeviceId(null); // ✅ No ID
+    setIsCreating(true); // ✅ Create mode
+    setActiveModal(true);
+  };
+
+  const updateDevice = (deviceId) => {
+    setOwnerDeviceView(null);
+    setFullView(false);
+    setIsCreating(false);
+    setDeviceId(deviceId);
+    setActiveModal(true);
+  };
+
+  const handleModal = () => {
+    setActiveModal(false);
     setDeviceId(null);
-    setActiveModal(true);
+    setIsCreating(false);
+    getDevices();
   };
 
-  const updateDevice = async (deviceId) => {
-    setOwnerDeviceView(null);
-    setFullView(null);
-    setDeviceId(deviceId);
-    setActiveModal(true);
+  const onDeviceCreated = () => {
+    handleModal(); // ✅ Close after creation
   };
-  useEffect(
-    () => {
-      getUser();
-    } /*[]*/
-  );
+
+  useEffect(() => {
+    getUser();
+  }, []);
 
   useEffect(() => {
     getDevices();
-  });
-
-  const handleModal = () => {
-    setActiveModal(!activeModal);
-    getDevices();
-    setDeviceId(null);
-  };
+  }, []);
 
   return (
     <>
@@ -124,66 +120,44 @@ const DeviceTable = () => {
         setErrorMessage={setErrorMessage}
         fullView={fullView}
         isAdmin={isAdmin}
+        isCreating={isCreating} // ✅ Pass down
+        onDeviceCreated={onDeviceCreated} // ✅ Pass down
       />
-      <div className="container">
-        {isAdmin ? (
-          <button
-            className="button is-fullwidth mb-3 is-primary"
-            onClick={() => createDevice()}
-          >
+
+      <div className="device-container">
+        {isAdmin && (
+          <button className="create-button" onClick={createDevice}>
             Create Device
           </button>
-        ) : (
-          <></>
         )}
         <ErrorMessage message={errorMessage} />
         {loaded && devices ? (
-          <table className="table is-fullwidth">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Device Type</th>
-                <th>Device ID</th>
-              </tr>
-            </thead>
-            <tbody>
-              {devices.map((device) => (
-                <tr key={device.device_id}>
-                  <td>{device.title}</td>
-                  <td>{device.device_type}</td>
-                  <td>{device.device_id}</td>
-                  <td>
-                    <button
-                      className="button mr-2 is-info is-light"
-                      onClick={() => openFullView(device.device_id)}
-                    >
-                      View
-                    </button>
-                    {isAdmin ? (
-                      <>
-                        <button
-                          className="button mr-2 is-info is-light"
-                          onClick={() => updateDevice(device.device_id)}
-                        >
-                          Update
-                        </button>
-                        <button
-                          className="button mr-2 is-info is-light"
-                          onClick={() => deleteDevice(device.device_id)}
-                        >
-                          Delete
-                        </button>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="device-grid">
+            {devices.map((device) => (
+              <div className="device-card" key={device.device_id}>
+                <h3>{device.title}</h3>
+                <p>Type: {device.device_type}</p>
+                <p>ID: {device.device_id}</p>
+                <div className="card-actions">
+                  <button onClick={() => openFullView(device.device_id)}>
+                    View
+                  </button>
+                  {isAdmin && (
+                    <>
+                      <button onClick={() => updateDevice(device.device_id)}>
+                        Update
+                      </button>
+                      <button onClick={() => deleteDevice(device.device_id)}>
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
-          <p>Loading</p>
+          <p>Loading...</p>
         )}
       </div>
     </>
@@ -191,5 +165,3 @@ const DeviceTable = () => {
 };
 
 export default DeviceTable;
-
-//bulma deinstallierne und styling ändern
