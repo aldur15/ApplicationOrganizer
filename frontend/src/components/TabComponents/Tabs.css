@@ -1,0 +1,11 @@
+.nav th {
+    display: inline-block;
+    margin-right: 10px; /* Add some margin between the tab items */
+    padding: 10px;
+    background-color: #eee;
+    cursor: pointer;
+  }
+  
+  .nav th.active {
+    background-color: #ccc;
+  }

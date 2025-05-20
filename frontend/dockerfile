@@ -1,0 +1,15 @@
+FROM node:19-alpine as build-step
+
+WORKDIR /app
+
+COPY . . 
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+FROM nginx:1.23.4-alpine
+
+COPY --from=build-step /app/build /usr/share/nginx/html
