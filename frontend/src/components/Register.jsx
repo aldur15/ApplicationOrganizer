@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import ErrorMessage from "./ErrorMessage";
 import { UserContext } from "../context/UserContext";
+import "../style.css";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -38,27 +39,31 @@ const Register = () => {
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto">
+    <div className="w-full max-w-sm mx-auto auth-panel">
       <form
-        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+        className="bg-white bg-opacity-90 shadow-xl rounded-2xl px-8 pt-6 pb-8 mb-4 border border-blue-100"
         onSubmit={handleSubmit}
       >
-        <h1 className="text-2xl font-bold text-center mb-6">Register</h1>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Rz-Name
+        <h1 className="text-2xl font-bold text-center text-blue-700 mb-6 tracking-wide">
+          Register
+        </h1>
+
+        <div className="mb-5">
+          <label className="block text-gray-700 text-sm font-semibold mb-2">
+            RZ-Name
           </label>
           <input
             type="text"
-            placeholder="Enter Name"
+            placeholder="Enter RZ name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
+            className="input-field"
             required
           />
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+
+        <div className="mb-5">
+          <label className="block text-gray-700 text-sm font-semibold mb-2">
             Password
           </label>
           <input
@@ -66,12 +71,13 @@ const Register = () => {
             placeholder="Enter password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
+            className="input-field"
             required
           />
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+
+        <div className="mb-5">
+          <label className="block text-gray-700 text-sm font-semibold mb-2">
             Confirm Password
           </label>
           <input
@@ -79,15 +85,17 @@ const Register = () => {
             placeholder="Confirm password"
             value={confirmationPassword}
             onChange={(e) => setConfirmationpassword(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
+            className="input-field"
             required
           />
         </div>
+
         <ErrorMessage message={errorMessage} />
-        <div className="mt-4">
+
+        <div className="mt-6">
           <button
             type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
           >
             Register
           </button>

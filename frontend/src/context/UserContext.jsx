@@ -7,30 +7,37 @@ export const UserProvider = (props) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const requestOptions = {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
-        },
-      };
+      try {
+        const response = await fetch("http://localhost:8000/api/users/me", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      const response = await fetch(
-        "http://localhost:8000/api/users/me",
-        requestOptions
-      );
-
-      if (!response.ok) {
+        if (!response.ok) {
+          console.warn("Token invalid or expired.");
+          setToken(null);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
         setToken(null);
+      } finally {
+        localStorage.setItem("LeadsToken", token);
       }
-      localStorage.setItem("LeadsToken", token);
     };
-    fetchUser();
+
+    if (token) {
+      fetchUser();
+    }
   }, [token]);
 
   return (
     <UserContext.Provider value={[token, setToken]}>
-      {props.children}
+      <div className="transition-opacity duration-300 ease-in text-gray-800">
+        {props.children}
+      </div>
     </UserContext.Provider>
   );
 };

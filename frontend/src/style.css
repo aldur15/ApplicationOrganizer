@@ -732,9 +732,6 @@
     font-weight: 600;
   }
   
-  .history-list {
-  }
-  
   .history-card:nth-child(2n) {
     background-color: var(--medium-grey);
   }
@@ -812,3 +809,128 @@
     margin-top: 2rem;
   }
   
+
+/* DeviceModal.css */
+
+/* Smooth fade-in animation for modal */
+@keyframes modalFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.device-modal-backdrop {
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+/* Scrollbar styling for overflow in modal */
+.device-modal-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.device-modal-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.device-modal-container::-webkit-scrollbar-thumb {
+  background-color: #999;
+  border-radius: 4px;
+}
+
+.device-modal-container::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Optional: Close button hover animation */
+.device-modal-close:hover {
+  transform: rotate(90deg);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Auth container entrance animation */
+.auth-panel {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reusable hover scale effect */
+.hover-panel {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-panel:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Footer refinement */
+.footer-text {
+  letter-spacing: 0.03em;
+}
+
+/* Optional input focus glow */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+}
+
+/* Optional dark mode styles */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #111827;
+    color: #f3f4f6;
+  }
+
+  .footer-text {
+    color: #d1d5db;
+  }
+
+  .bg-white {
+    background-color: #1f2937 !important;
+  }
+
+  .text-gray-800 {
+    color: #e5e7eb !important;
+  }
+}
+
+.input-field {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 text-gray-800 transition;
+}
+
+.auth-panel {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-message {
+  @apply font-semibold text-red-600 text-sm mt-2 px-2 border-l-4 border-red-400 bg-red-50 rounded;
+}

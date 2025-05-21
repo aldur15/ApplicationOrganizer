@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-
 import moment from "moment";
 import PurchasingModal from "../../Modals/PurchasingModal";
+import "./../Tabs.css";
 
 const PurchasingTab = ({ device_id, token, isAdmin, setErrorMessage }) => {
   const [device, setDevice] = useState("");
@@ -94,7 +94,7 @@ const PurchasingTab = ({ device_id, token, isAdmin, setErrorMessage }) => {
   };
 
   return (
-    <>
+    <div className="p-4">
       <PurchasingModal
         active={activeModal}
         handleModal={handleModal}
@@ -104,65 +104,66 @@ const PurchasingTab = ({ device_id, token, isAdmin, setErrorMessage }) => {
         setErrorMessage={setErrorMessage}
         isCreate={isCreate}
       />
-      <button
-        className="button is-fullwidth mb-5 is-primary"
-        onClick={() => createPurchasings()}
-      >
-        Create Purchase
-      </button>
-      <table className="table is-fullwidth">
-        <thead>
-          <tr>
-            <th>Purchase</th>
-            <th>Warranty End</th>
-            <th>Purchase Date</th>
-            <th>Cost Centre</th>
-            <th>Seller</th>
-          </tr>
-        </thead>
-        <tbody>
-          {devicePurchases.map((purchase) => (
-            <tr key={purchase.purchasing_information_id}>
-              <td>{purchase.price}</td>
-              <td>
-                {moment(purchase.timestamp_warranty_end).format("MMM Do YY")}
-              </td>
-              <td>{moment(purchase.timestamp_purchase).format("MMM Do YY")}</td>
-              <td>{purchase.cost_centre}</td>
-              <td>{purchase.seller}</td>
-              <>
-                {isAdmin ? (
-                  <>
-                    <td>
-                      <button
-                        className="button mr-1 is-info is-light"
-                        onClick={() =>
-                          updatePurchase(purchase.purchasing_information_id)
-                        }
-                      >
-                        Update
-                      </button>
-                    </td>
-                    <td>
-                      <button
-                        className="button mr-1 is-info is-light"
-                        onClick={() =>
-                          deletePurchase(purchase.purchasing_information_id)
-                        }
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </>
-                ) : (
-                  <></>
-                )}
-              </>
+
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition"
+          onClick={createPurchasings}
+        >
+          Create Purchase
+        </button>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm text-left text-gray-600 border">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-100 border-b">
+            <tr>
+              <th scope="col" className="px-4 py-3">Purchase</th>
+              <th scope="col" className="px-4 py-3">Warranty End</th>
+              <th scope="col" className="px-4 py-3">Purchase Date</th>
+              <th scope="col" className="px-4 py-3">Cost Centre</th>
+              <th scope="col" className="px-4 py-3">Seller</th>
+              {isAdmin && <th scope="col" className="px-4 py-3 text-right">Actions</th>}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </>
+          </thead>
+          <tbody>
+            {devicePurchases.map((purchase) => (
+              <tr
+                key={purchase.purchasing_information_id}
+                className="border-b hover:bg-gray-50"
+              >
+                <td className="px-4 py-2">{purchase.price}</td>
+                <td className="px-4 py-2">
+                  {moment(purchase.timestamp_warranty_end).format("MMM Do YY")}
+                </td>
+                <td className="px-4 py-2">
+                  {moment(purchase.timestamp_purchase).format("MMM Do YY")}
+                </td>
+                <td className="px-4 py-2">{purchase.cost_centre}</td>
+                <td className="px-4 py-2">{purchase.seller}</td>
+                {isAdmin && (
+                  <td className="px-4 py-2 text-right space-x-2">
+                    <button
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+                      onClick={() => updatePurchase(purchase.purchasing_information_id)}
+                    >
+                      Update
+                    </button>
+                    <button
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                      onClick={() => deletePurchase(purchase.purchasing_information_id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
+
 export default PurchasingTab;

@@ -1,3 +1,6 @@
+
+//import "./../../style.css";
+import "./Modal.css";
 import React, { useEffect, useState } from "react";
 import Tabs from "../TabComponents/Tabs";
 import roomCodesData from "./data/hoersaal_raumcode.json";
@@ -30,10 +33,12 @@ const DeviceModal = ({
   };
 
   const [formData, setFormData] = useState(initialFormState);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!device_id) return;
-
+    setLoading(true);
     const getDevice = async () => {
       try {
         const res = await fetch(`http://localhost:8000/devices/${device_id}`, {
@@ -66,6 +71,8 @@ const DeviceModal = ({
         });
       } catch (err) {
         setErrorMessage(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -81,6 +88,7 @@ const DeviceModal = ({
 
   const submitDevice = async (e, method) => {
     e.preventDefault();
+    setSubmitting(true);
 
     const url = device_id
       ? `http://localhost:8000/devices/${device_id}`
@@ -117,36 +125,52 @@ const DeviceModal = ({
       handleModal();
     } catch (err) {
       setErrorMessage(err.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const extractRoomCodes = () => roomCodesData.map(({ room_code }) => room_code);
 
+  const formFields = [
+    { name: "title", label: "Title", type: "text" },
+    { name: "deviceType", label: "Device Type", type: "text" },
+    { name: "description", label: "Description", type: "text" },
+    { name: "accessories", label: "Accessories", type: "text" },
+    { name: "serialNumber", label: "Serial Number", type: "text" },
+    { name: "usernameBuyer", label: "Username Buyer", type: "text" },
+    { name: "imageURL", label: "Image URL", type: "url" },
+    { name: "owner", label: "Owner", type: "text" },
+    { name: "price", label: "Price", type: "number" },
+    { name: "timestampWarrantyEnd", label: "Warranty End Date", type: "date" },
+    { name: "timestampPurchase", label: "Purchase Date", type: "date" },
+    { name: "costCentre", label: "Cost Centre", type: "text" },
+    { name: "seller", label: "Seller", type: "text" },
+  ];
+
   if (!active) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-auto">
-        <header className="bg-blue-100 p-4 rounded-t-lg flex justify-between items-center">
-          <h1 className="text-xl font-semibold">
-            {fullView
-              ? "Overview"
-              : device_id
-              ? "Update Device"
-              : "Create Device"}
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 device-modal-backdrop"
+    >
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 device-modal-container">
+        <header className="border-b pb-4 mb-6 flex justify-between items-center">
+          <h1 className="text-2xl font-bold">
+            {fullView ? "Overview" : device_id ? "Update Device" : "Create Device"}
           </h1>
-          <div>
-            <button
-              onClick={handleModal}
-              className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
-              title="Close modal"
-            >
-              X
-            </button>
-          </div>
+          <button
+            onClick={handleModal}
+            className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 device-modal-close"
+            title="Close modal"
+          >
+            &times;
+          </button>
         </header>
 
-        <section className="p-4">
+        <section>
           {fullView ? (
             <Tabs
               device_id={device_id}
@@ -155,52 +179,41 @@ const DeviceModal = ({
               setErrorMessage={setErrorMessage}
             />
           ) : ownerView ? (
-            <div>
-              <p>Owner view not fully implemented</p>
-            </div>
+            <p className="text-gray-600">Owner view not fully implemented</p>
+          ) : loading ? (
+            <p className="text-center">Loading...</p>
           ) : (
             <form
               onSubmit={(e) => submitDevice(e, device_id ? "PUT" : "POST")}
-              className="space-y-4"
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
-              {/* Replace below with your actual form fields */}
-              {[
-                { label: "Title", name: "title" },
-                { label: "Device Type", name: "deviceType" },
-                { label: "Description", name: "description" },
-                { label: "Accessories", name: "accessories" },
-                { label: "Serial Number", name: "serialNumber" },
-                { label: "RZ Username Buyer", name: "usernameBuyer" },
-                { label: "Image URL", name: "imageURL" },
-                { label: "Owner", name: "owner" },
-                { label: "Price", name: "price" },
-                { label: "Timestamp Warranty End", name: "timestampWarrantyEnd" },
-                { label: "Timestamp Purchase", name: "timestampPurchase" },
-                { label: "Cost Centre", name: "costCentre" },
-                { label: "Seller", name: "seller" },
-              ].map(({ label, name }) => (
+              {formFields.map(({ name, label, type }) => (
                 <div key={name} className="flex flex-col">
-                  <label className="mb-1 font-medium">{label}</label>
+                  <label htmlFor={name} className="mb-3 text-sm font-bold tracking-wide capitalize text-gray-800">
+                    {label}
+                  </label>
                   <input
-                    type="text"
+                    id={name}
+                    type={type}
                     name={name}
-                    placeholder={`Enter ${label.toLowerCase()}`}
+                    placeholder={`Enter ${label}`}
                     value={formData[name]}
                     onChange={handleChange}
                     required
-                    className="border rounded px-3 py-2"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
                   />
                 </div>
               ))}
 
               <div className="flex flex-col">
-                <label className="mb-1 font-medium">Room Code</label>
+                <label htmlFor="roomCode" className="mb-3 text-sm font-bold text-gray-800 tracking-wide">Room Code</label>
                 <select
+                  id="roomCode"
                   name="roomCode"
                   value={formData.roomCode}
                   onChange={handleChange}
                   required
-                  className="border rounded px-3 py-2"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
                 >
                   <option value="" disabled>
                     Select room code
@@ -213,21 +226,22 @@ const DeviceModal = ({
                 </select>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-4">
+              <div className="col-span-full flex justify-end space-x-4 mt-6">
                 <button
                   type="submit"
+                  disabled={submitting}
                   className={`${
-                    device_id
-                      ? "bg-blue-500 hover:bg-blue-600"
-                      : "bg-green-500 hover:bg-green-600"
-                  } text-white px-4 py-2 rounded`}
+                    device_id ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"
+                  } text-white font-semibold px-6 py-2 rounded-full transition ${
+                    submitting ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
-                  {device_id ? "Update" : "Create"}
+                  {submitting ? "Submitting..." : device_id ? "Update" : "Create"}
                 </button>
                 <button
                   type="button"
                   onClick={handleModal}
-                  className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+                  className="bg-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-400"
                 >
                   Cancel
                 </button>
@@ -237,10 +251,10 @@ const DeviceModal = ({
         </section>
 
         {fullView && (
-          <footer className="bg-blue-100 p-4 rounded-b-lg flex justify-end">
+          <footer className="mt-6 border-t pt-4 flex justify-end">
             <button
               onClick={handleModal}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700"
             >
               Close
             </button>
